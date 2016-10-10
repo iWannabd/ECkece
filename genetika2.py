@@ -26,10 +26,16 @@ class Individu(object):
 
 	def totaljarak(self):
 		total = 0
+		demands = 0
 		n = len(self.kromosom)-1 #panjang kromosom min satu
-		total += nodes[self.kromosom[0]].jarak(nodes[0])
+		total += nodes[self.kromosom[0]].jarak(nodes[0]) #jarak dari rumah
 		for i in xrange(0,n):
-			total += nodes[self.kromosom[i]].jarak(nodes[self.kromosom[i+1]]) #menjumlah total jarak
+			demands += nodes[self.kromosom[i]].demand
+			if demands>100: #balik dlu yaaa
+				total += nodes[self.kromosom[i]].jarak(nodes[self.kromosom[0]]) + nodes[self.kromosom[i]].jarak(nodes[self.kromosom[i+1]])
+			else: #lanjut gan
+				total += nodes[self.kromosom[i]].jarak(nodes[self.kromosom[i+1]]) #menjumlah total jarak
+
 		total += nodes[self.kromosom[0]].jarak(nodes[self.kromosom[n]]) #ditambah jarak dari node terahir ke rumah
 		return total
 
@@ -149,7 +155,14 @@ def mutasi(individu):
 		kromo[t1],kromo[t2] = kromo[t2],kromo[t1]
 	return Individu(kromo)
 
-panjangkromosom = 12 #panjang kromosom
+def elitelit(populasi,n):
+	#n adalah jumlah elit
+	terbail = []
+	populasi = sorted(populasi,key=lambda x:x.fitness,reverse=True)
+	return populasi[:n]
+
+
+panjangkromosom = 10 #panjang kromosom
 panjangkromosom += 1
 jumlahindv = 10 #jumlah individu dalam populasi
 gen = 1
@@ -160,17 +173,10 @@ while True:
 	for i in xrange(0,jumlahindv/2):
 		generasibaru += crossOver(populasi[2*i],populasi[(2*i)+1])
 	#baru lahir langsung dimutasi
-	for i in xrange(0,jumlahindv):
-		generasibaru[i] = mutasi(generasibaru[i])
+	generasibaru = [mutasi(p) for p in generasibaru]
 	#general replacement
-	populasi = generasibaru
+	populasi = elitelit(generasibaru,4) + generasibaru
 	print "generasi ke",gen
 	for individu in populasi:
 		print individu.kromosom, individu.fitness
 	gen += 1
-
-
-
-
-
-
