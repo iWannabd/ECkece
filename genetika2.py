@@ -54,7 +54,7 @@ def randomPopulasi(pk,jp):
 	while (len(populasi)<jp):
 		calkro = [] #calon kromosom
 		while (len(calkro)<pk-1):
-			gen = random.randint(0,len(nodes)-1)
+			gen = random.randint(1,len(nodes)-1)
 			if gen not in calkro:
 				calkro.append(gen)
 		ind = Individu(calkro)
@@ -162,21 +162,25 @@ def elitelit(populasi,n):
 	return populasi[:n]
 
 
-panjangkromosom = 10 #panjang kromosom
+panjangkromosom = 19 #panjang kromosom
 panjangkromosom += 1
 jumlahindv = 10 #jumlah individu dalam populasi
 gen = 1
 populasi = randomPopulasi(panjangkromosom,jumlahindv)
-while True:
+
+
+while gen<1000:
 	populasi = rodaPutar(populasi,jumlahindv)
 	generasibaru = []
 	for i in xrange(0,jumlahindv/2):
 		generasibaru += crossOver(populasi[2*i],populasi[(2*i)+1])
 	#baru lahir langsung dimutasi
 	generasibaru = [mutasi(p) for p in generasibaru]
+	generasibaru = sorted(generasibaru,key=lambda x:x.fitness,reverse=True)
 	#general replacement
-	populasi = elitelit(generasibaru,4) + generasibaru
+	populasi = elitelit(populasi[:],2) + generasibaru[:-2]
 	print "generasi ke",gen
-	for individu in populasi:
-		print individu.kromosom, individu.fitness
+	print populasi[0].kromosom, populasi[0].fitness
+	# for individu in populasi[:2]:
+	# 	print individu.kromosom, individu.fitness, 1/individu.fitness
 	gen += 1
